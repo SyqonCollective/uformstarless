@@ -1,0 +1,51 @@
+# Quick Fix UFormer Training Configuration
+# Continues training from existing checkpoint with shifted window architecture
+
+# Model architecture (same as original UFormer)
+model:
+  embed_dim: 96
+  window_size: 8
+  depths: [2, 2, 6, 2] 
+  num_heads: [3, 6, 12, 24]
+
+# Data paths
+data:
+  train_input_dir: "train/input"
+  train_target_dir: "train/target"
+  val_input_dir: "val/input"
+  val_target_dir: "val/target"
+
+# Training settings
+training:
+  epochs: 50  # Continue for additional epochs
+  batch_size: 8  # Adjust based on GPU memory
+  val_batch_size: 4
+  num_workers: 4
+  
+  # Optimizer
+  optimizer: "adamw"
+  learning_rate: 1e-5  # Lower LR for fine-tuning
+  weight_decay: 1e-4
+  
+  # Scheduler
+  scheduler: "cosine"
+  scheduler_step: 10
+  scheduler_gamma: 0.5
+  
+  # Logging
+  log_interval: 50
+  val_subset_size: 100  # Fast validation
+  
+  # Early stopping
+  early_stopping_patience: 10
+
+# Loss configuration  
+mask_weight: 0.1
+
+# Experiment tracking
+experiment:
+  output_dir: "experiments/quick_fix_uformer"
+  log_dir: "experiments/quick_fix_uformer/logs"
+
+# Resume settings (will be set via command line)
+# pretrained_checkpoint: "check/best_model.pth"

@@ -1,0 +1,44 @@
+# UFormer Star Removal - DEBUG CONFIG
+
+experiment:
+  name: "uformer_debug"
+  output_dir: "experiments"
+
+data:
+  train_input_dir: "train/input"
+  train_target_dir: "train/target" 
+  val_input_dir: "val/input"
+  val_target_dir: "val/target"
+
+model:
+  embed_dim: 96
+  win_size: 8
+  depths: [2, 2, 6, 2]
+  num_heads: [3, 6, 12, 24]
+
+training:
+  epochs: 5
+  batch_size: 16  # Increased for A100
+  val_batch_size: 8
+  num_workers: 4  # Use multiple workers for better data loading
+  
+  optimizer:
+    name: "adamw"
+    lr: 0.0002
+    weight_decay: 0.01
+    betas: [0.9, 0.999]
+  
+  scheduler:
+    name: "cosineannealinglr"
+    eta_min: 0.000001
+  
+  compile_model: false
+  log_interval: 10
+  save_interval: 1
+  resume_checkpoint: "experiments/uformer_debug/checkpoints/checkpoint_epoch_0001.pth"  # Path to resume from
+
+mask_weight: 0.1
+
+early_stopping:
+  patience: 15
+  min_delta: 0.0001
