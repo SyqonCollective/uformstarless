@@ -1,0 +1,49 @@
+# Config con Color Preservation per prime epoche
+experiment:
+  name: "uformer_color_fix"
+  output_dir: "experiments"
+
+data:
+  train_input_dir: "train_tiles/input"
+  train_target_dir: "train_tiles/target" 
+  val_input_dir: "val_tiles/input"
+  val_target_dir: "val_tiles/target"
+
+model:
+  embed_dim: 96
+  win_size: 8
+  depths: [2, 2, 6, 2]
+  num_heads: [3, 6, 12, 24]
+  shifted_window: true
+  halo_size: 4
+  focal_interval: 999  # No focal blocks per stabilità
+
+training:
+  epochs: 300
+  batch_size: 10
+  val_batch_size: 20
+  num_workers: 4
+  val_subset_size: 1000
+  
+  optimizer:
+    name: "adamw"
+    lr: 0.0003    # Aumentato per convergenza più rapida
+    weight_decay: 0.01
+    betas: [0.9, 0.999]
+  
+  scheduler:
+    name: "cosineannealinglr"
+    eta_min: 0.000001
+  
+  compile_model: false
+  log_interval: 10
+  save_interval: 1
+
+resume_checkpoint: "best_model.pth"
+
+# Loss ottimizzata per preservare colori
+loss:
+  l1_weight: 1.0
+  perceptual_weight: 0.01  # MOLTO ridotto prime epoche
+  ssim_weight: 0.01        # MOLTO ridotto prime epoche
+  mask_weight: 0.1
