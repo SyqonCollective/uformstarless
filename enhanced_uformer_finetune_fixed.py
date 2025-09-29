@@ -171,7 +171,7 @@ class EnhancedUFormerTrainer:
                 avg_loss = total_loss / (batch_idx + 1)
                 pbar.set_postfix({
                     'Loss': f'{avg_loss:.4f}',
-                    'L1': f'{total_components.get("l1_loss", 0)/(batch_idx+1):.4f}',
+                    'L1': f'{total_components.get("l1_img_loss", 0)/(batch_idx+1):.4f}',
                     'Perc': f'{total_components.get("perceptual_loss", 0)/(batch_idx+1):.4f}'
                 })
         
