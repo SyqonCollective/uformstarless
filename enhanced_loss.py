@@ -60,6 +60,13 @@ class VGGPerceptualLoss(nn.Module):
             std=[0.229, 0.224, 0.225]
         )
         
+    def to(self, device):
+        """Override to method to ensure VGG layers go to device"""
+        super().to(device)
+        for layer in self.vgg_layers.values():
+            layer.to(device)
+        return self
+        
     def forward(self, pred: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
         """
         Args:
@@ -180,6 +187,14 @@ class EnhancedUFormerLoss(nn.Module):
         # SSIM loss (opzionale)
         if self.use_ssim:
             self.ssim_loss = SSIMLoss()
+            
+    def to(self, device):
+        """Override to method to ensure all components go to device"""
+        super().to(device)
+        self.perceptual_loss.to(device)
+        if hasattr(self, 'ssim_loss'):
+            self.ssim_loss.to(device)
+        return self
         
     def forward(
         self, 
