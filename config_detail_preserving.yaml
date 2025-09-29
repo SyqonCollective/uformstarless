@@ -1,0 +1,53 @@
+# Detail-Preserving UFormer Config
+# Modifica SOLO le stelle, preserva tutto il resto
+
+experiment:
+  name: "uformer_detail_preserving"
+  output_dir: "experiments"
+
+data:
+  train_input_dir: "train_tiles/input"
+  train_target_dir: "train_tiles/target" 
+  val_input_dir: "val_tiles/input"
+  val_target_dir: "val_tiles/target"
+
+model:
+  embed_dim: 96
+  win_size: 8
+  depths: [2, 2, 6, 2]
+  num_heads: [3, 6, 12, 24]
+  shifted_window: true           # ESSENZIALE per eliminare quadretti
+  halo_size: 4
+  focal_interval: 999            # Disabilita focal blocks per stabilità
+
+training:
+  epochs: 100                    # Meno epoche - convergenza più rapida
+  batch_size: 8                  # Ridotto per stabilità
+  val_batch_size: 16
+  num_workers: 4
+  val_subset_size: 1000
+  
+  optimizer:
+    name: "adamw"
+    lr: 0.0001                   # LR ridotto per preservare dettagli
+    weight_decay: 0.01
+    betas: [0.9, 0.999]
+  
+  scheduler:
+    name: "cosineannealinglr"
+    eta_min: 0.00001
+  
+  compile_model: false
+  log_interval: 10
+  save_interval: 5
+
+# Resume from your current best model
+resume_checkpoint: "best_enhanced_model.pth"
+
+# Star-Focused Loss Configuration  
+loss:
+  type: "star_focused"           # NUOVA LOSS
+  l1_weight: 1.0
+  mask_focus_weight: 5.0         # Focus solo su aree stelle
+  preserve_weight: 10.0          # Forte penalità per modifiche non-stelle
+  perceptual_weight: 0.0         # DISABILITATO - causa smoothing
