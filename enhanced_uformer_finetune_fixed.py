@@ -16,7 +16,7 @@ from tqdm import tqdm
 import numpy as np
 
 from enhanced_uformer import EnhancedUFormerStarRemoval
-from star_dataset import StarDataset
+from star_dataset import StarRemovalDataset
 from enhanced_loss import EnhancedUFormerLoss
 
 # Setup logging
@@ -90,11 +90,10 @@ class EnhancedUFormerTrainer:
         train_config = self.config['data']
         
         # Training dataset
-        self.train_dataset = StarDataset(
+        self.train_dataset = StarRemovalDataset(
             input_dir=train_config['train_input_dir'],
             target_dir=train_config['train_target_dir'],
-            transform=True,
-            cache_size=1000
+            augment=True
         )
         
         self.train_loader = DataLoader(
@@ -107,11 +106,10 @@ class EnhancedUFormerTrainer:
         )
         
         # Validation dataset
-        self.val_dataset = StarDataset(
+        self.val_dataset = StarRemovalDataset(
             input_dir=train_config['val_input_dir'],
             target_dir=train_config['val_target_dir'],
-            transform=False,
-            cache_size=500
+            augment=False
         )
         
         self.val_loader = DataLoader(
@@ -140,11 +138,10 @@ class EnhancedUFormerTrainer:
         
         pbar = tqdm(self.train_loader, desc=f"Training Epoch {epoch}")
         
-        for batch_idx, (inputs, targets, masks) in enumerate(pbar):
-            inputs = inputs.to(self.device)
-            targets = targets.to(self.device)
-            if masks is not None:
-                masks = masks.to(self.device)
+        for batch_idx, batch in enumerate(pbar):
+            inputs = batch['input'].to(self.device)
+            targets = batch['target'].to(self.device)
+            masks = batch['mask'].to(self.device)
             
             optimizer.zero_grad()
             
@@ -191,11 +188,10 @@ class EnhancedUFormerTrainer:
         total_components = {}
         
         with torch.no_grad():
-            for inputs, targets, masks in tqdm(self.val_loader, desc=f"Validation Epoch {epoch}"):
-                inputs = inputs.to(self.device)
-                targets = targets.to(self.device)
-                if masks is not None:
-                    masks = masks.to(self.device)
+            for batch in tqdm(self.val_loader, desc=f"Validation Epoch {epoch}"):
+                inputs = batch['input'].to(self.device)
+                targets = batch['target'].to(self.device)
+                masks = batch['mask'].to(self.device)
                 
                 pred_starless, pred_mask = self.model(inputs)
                 loss, loss_dict = self.criterion(pred_starless, pred_mask, targets, masks)
