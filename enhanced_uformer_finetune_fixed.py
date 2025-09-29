@@ -168,11 +168,16 @@ class EnhancedUFormerTrainer:
             
             # Update progress bar
             if batch_idx % 10 == 0:
-                avg_loss = total_loss / (batch_idx + 1)
+                # Calcola medie aggiornate
+                num_batches = batch_idx + 1
+                avg_loss = total_loss / num_batches
+                avg_l1 = total_components.get("l1_img_loss", 0) / num_batches
+                avg_perc = total_components.get("perceptual_loss", 0) / num_batches
+                
                 pbar.set_postfix({
                     'Loss': f'{avg_loss:.4f}',
-                    'L1': f'{total_components.get("l1_img_loss", 0)/(batch_idx+1):.4f}',
-                    'Perc': f'{total_components.get("perceptual_loss", 0)/(batch_idx+1):.4f}'
+                    'L1': f'{avg_l1:.4f}',
+                    'Perc': f'{avg_perc:.4f}'
                 })
         
         # Calcola medie
