@@ -175,21 +175,36 @@ class HaloAttention(nn.Module):
         """
         B, H, W, C = x.shape
         
-        # Padding per halo
-        x_padded = F.pad(x, (0, 0, self.halo_size, self.halo_size, 
-                            self.halo_size, self.halo_size), mode='reflect')
+        # Padding per halo (corretto)
+        x_padded = F.pad(x.permute(0, 3, 1, 2), 
+                        (self.halo_size, self.halo_size, self.halo_size, self.halo_size), 
+                        mode='reflect').permute(0, 2, 3, 1)
         
-        # Window partition
+        # Dimensioni dopo padding
+        H_pad, W_pad = H + 2 * self.halo_size, W + 2 * self.halo_size
+        
+        # Window partition con halo
         ws_with_halo = self.window_size + 2 * self.halo_size
         
-        x_windows = x_padded.view(
-            B, 
-            H // self.window_size, ws_with_halo,
-            W // self.window_size, ws_with_halo,
-            C
-        ).permute(0, 1, 3, 2, 4, 5).contiguous().view(
-            -1, ws_with_halo, ws_with_halo, C
-        )
+        # Calcola numero di finestre
+        num_windows_h = H // self.window_size
+        num_windows_w = W // self.window_size
+        
+        # Estrai finestre con halo (sliding windows)
+        windows = []
+        for i in range(num_windows_h):
+            for j in range(num_windows_w):
+                h_start = i * self.window_size
+                h_end = h_start + ws_with_halo
+                w_start = j * self.window_size  
+                w_end = w_start + ws_with_halo
+                
+                window = x_padded[:, h_start:h_end, w_start:w_end, :]
+                windows.append(window)
+        
+        # Stack windows
+        x_windows = torch.stack(windows, dim=1)  # [B, num_windows, ws_with_halo, ws_with_halo, C]
+        x_windows = x_windows.view(-1, ws_with_halo, ws_with_halo, C)  # [B*num_windows, ws_with_halo, ws_with_halo, C]
         
         return x_windows
     
