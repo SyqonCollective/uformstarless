@@ -1,0 +1,50 @@
+# UFormer Star Removal - NO FOCAL CONFIG (FIX TEMPORANEO)
+
+experiment:
+  name: "uformer_no_focal"
+  output_dir: "experiments"
+
+data:
+  train_input_dir: "train_tiles/input"
+  train_target_dir: "train_tiles/target" 
+  val_input_dir: "val_tiles/input"
+  val_target_dir: "val_tiles/target"
+
+model:
+  embed_dim: 96
+  win_size: 8                    # Mantiene finestre piccole per inferenza leggera
+  depths: [2, 2, 6, 2]          # Profondità maggiore nel livello centrale
+  num_heads: [3, 6, 12, 24]
+  shifted_window: true          # ESSENZIALE: elimina quadretti 8x8
+  halo_size: 4                  # Proporzionale al win_size
+  focal_interval: 999           # DISABILITA focal blocks (interval > depths)
+
+training:
+  epochs: 300
+  batch_size: 16  # Increased for A100
+  val_batch_size: 32  # Increased validation batch size
+  num_workers: 4  # Use multiple workers for better data loading
+  val_subset_size: 1000  # Use only 1000 samples for faster validation
+  
+  optimizer:
+    name: "adamw"
+    lr: 0.0002
+    weight_decay: 0.01
+    betas: [0.9, 0.999]
+  
+  scheduler:
+    name: "cosineannealinglr"
+    eta_min: 0.000001
+  
+  compile_model: false
+  log_interval: 10
+  save_interval: 1
+
+# Resume from checkpoint
+resume_checkpoint: "best_model.pth"
+
+# Enhanced Loss Configuration
+loss:
+  l1_weight: 1.0              # Base L1 loss
+  perceptual_weight: 0.1      # VGG perceptual loss per qualità visiva
+  ssim_weight: 0.1            # SSIM loss per similarità strutturale
