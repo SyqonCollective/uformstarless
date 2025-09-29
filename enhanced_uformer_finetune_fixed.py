@@ -59,7 +59,7 @@ class EnhancedUFormerTrainer:
             ssim_weight=loss_config.get('ssim_weight', 0.1),
             mask_weight=loss_config.get('mask_weight', 0.1),
             use_ssim=loss_config.get('use_ssim', True)
-        )
+        ).to(self.device)
         
         # Setup datasets
         self.setup_datasets()
