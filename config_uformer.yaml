@@ -5,10 +5,10 @@ experiment:
   output_dir: "experiments"
 
 data:
-  train_input_dir: "train/input"
-  train_target_dir: "train/target" 
-  val_input_dir: "val/input"
-  val_target_dir: "val/target"
+  train_input_dir: "train_tiles/input"
+  train_target_dir: "train_tiles/target" 
+  val_input_dir: "val_tiles/input"
+  val_target_dir: "val_tiles/target"
 
 model:
   embed_dim: 96

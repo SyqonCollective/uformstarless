@@ -62,32 +62,32 @@ print('✅ Immagine di test creata: test_image.jpg')
         echo "🏋️ Training Mode"
         echo ""
         
-        # Verifica directory dati
-        if [[ ! -d "data/train" ]]; then
-            echo "📁 Creazione struttura directory dati..."
-            mkdir -p data/train/input
-            mkdir -p data/train/target  
-            mkdir -p data/val/input
-            mkdir -p data/val/target
+        # Verifica directory dati (tiles)
+        if [[ ! -d "train_tiles" ]]; then
+            echo "📁 Creazione struttura directory dati tiles..."
+            mkdir -p train_tiles/input
+            mkdir -p train_tiles/target  
+            mkdir -p val_tiles/input
+            mkdir -p val_tiles/target
             
             echo "⚠️  Directory dati create ma vuote!"
-            echo "Carica le tue immagini in:"
-            echo "  - data/train/input/ (immagini con stelle)"
-            echo "  - data/train/target/ (immagini senza stelle)"
-            echo "  - data/val/input/ (validation con stelle)"
-            echo "  - data/val/target/ (validation senza stelle)"
+            echo "Carica le tue immagini tiles in:"
+            echo "  - train_tiles/input/ (tiles con stelle)"
+            echo "  - train_tiles/target/ (tiles senza stelle)"
+            echo "  - val_tiles/input/ (validation tiles con stelle)"
+            echo "  - val_tiles/target/ (validation tiles senza stelle)"
             echo ""
         fi
         
-        # Controlla se ci sono dati
-        train_count=$(find data/train/input -name "*.jpg" -o -name "*.png" | wc -l)
+        # Controlla se ci sono dati tiles
+        train_count=$(find train_tiles/input -name "*.jpg" -o -name "*.png" 2>/dev/null | wc -l)
         if [[ $train_count -eq 0 ]]; then
             echo "❌ Nessun dato di training trovato!"
-            echo "Carica prima le immagini nelle directory dati"
+            echo "Carica prima le immagini tiles nelle directory"
             exit 1
         fi
         
-        echo "📊 Trovate $train_count immagini di training"
+        echo "📊 Trovate $train_count immagini tiles di training"
         echo ""
         
         # Cerca checkpoint esistente

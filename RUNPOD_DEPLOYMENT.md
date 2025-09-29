@@ -52,11 +52,12 @@ Dopo il setup, `/workspace` conterrà:
 ├── demo_enhanced_shifted.py     # Script demo
 ├── enhanced_uformer_finetune.py # Training script
 ├── runpod_start.sh              # Quick start
-├── data/                        # Directory per dataset
-│   ├── train/input/            # Immagini con stelle
-│   ├── train/target/           # Immagini senza stelle
-│   ├── val/input/              # Validation con stelle
-│   └── val/target/             # Validation senza stelle
+├── train_tiles/                 # Training tiles dataset
+│   ├── input/                  # Tiles con stelle
+│   └── target/                 # Tiles senza stelle
+├── val_tiles/                   # Validation tiles dataset
+│   ├── input/                  # Validation tiles con stelle
+│   └── target/                 # Validation tiles senza stelle
 ├── checkpoints/                 # Checkpoint modelli
 ├── experiments/                 # Risultati esperimenti
 └── logs/                       # Log training
